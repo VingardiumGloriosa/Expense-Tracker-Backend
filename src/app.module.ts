@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EntryModule } from './entry/entry.module';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { CategoryModule } from './category/category.module';
 
 @Module({
  imports: [
@@ -25,6 +25,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
      inject: [ConfigService],
    }),
    EntryModule,
+   CategoryModule,
  ],
  controllers: [AppController],
  providers: [AppService],

@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
-import { Entry } from './entry/entities/entry.entity';
-import { Category } from './entry/entities/category.entity';
+import { Entry } from './entities/entry.entity';
+import { Category } from './entities/category.entity';
 
 dotenv.config(); // This ensures your .env file is read
 

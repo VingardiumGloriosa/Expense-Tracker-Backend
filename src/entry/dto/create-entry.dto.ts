@@ -1,4 +1,4 @@
-import { IsDate, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateEntryDto {
 
@@ -19,19 +19,19 @@ export class CreateEntryDto {
     name: string;
 
     @IsNotEmpty()
-    @IsString()
-    categoryName: string; // Assuming you're linking categories by their name
+    @IsNumber()
+    categoryId: number;
 
     @IsOptional()
     @IsString()
     comment: string;
 
-    constructor(amount: number, date: Date, currency: string, name: string, categoryName: string, comment?: string){
+    constructor(amount: number, date: Date, currency: string, name: string, categoryId: number, comment?: string){
         this.amount = amount;
         this.date = date;
         this.currency = currency;
         this.name = name;
-        this.categoryName = categoryName;
+        this.categoryId = categoryId;
         this.comment = comment;
     } 
 }

@@ -21,9 +21,9 @@ export class Entry {
     @Column({ nullable: true })
     comment: string;
 
-    // @ManyToOne(() => Category, category => category.entries, {
-    //     eager: true, // or set to false if you don't want to automatically load the category with each entry
-    // })
+    @ManyToOne(() => Category, category => category.entries, {
+        eager: true, // or set to false if you don't want to automatically load the category with each entry
+    })
     @JoinColumn({ name: 'categoryId' }) // This column will store the relation
     category: Category;
 }
