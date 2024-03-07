@@ -21,6 +21,9 @@ export class Entry {
     @Column({ nullable: true })
     comment: string;
 
+    @Column()
+    categoryId: number;
+
     @ManyToOne(() => Category, category => category.entries, {
         eager: true, // or set to false if you don't want to automatically load the category with each entry
     })

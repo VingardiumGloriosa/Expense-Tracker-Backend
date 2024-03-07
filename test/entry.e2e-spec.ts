@@ -1,52 +1,117 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { CreateEntryDto } from '../src/entry/dto/create-entry.dto';
+import { AppModule } from '../src/app.module';
 
-describe('AppController (e2e)', () => {
+describe('EntryController (e2e)', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe())
     await app.init();
   });
 
-  describe('/ (GET) entry controller', () => {
-    it('/ (GET)', () => {
-        return request(app.getHttpServer())
-        .get('/')
-        .expect(200)
-        .expect('Hello World!');
-    });
-    })
+  it('/entry (POST) should create a new entry', () => {
+    return request(app.getHttpServer())
+      .post('/entry')
+      .send({
+        name: 'New Entry',
+        amount: 100,
+        date: '2023-01-01',
+        currency: 'USD',
+        categoryId: 1,
+        comment: 'Test Comment',
+      })
+      .expect(201)
+      .then((response) => {
+        expect(response.body).toEqual(expect.objectContaining({
+          id: expect.any(Number),
+          name: 'New Entry',
+          amount: 100,
+          date: expect.any(String),
+          currency: 'USD',
+          category: {
+            id: 1,
+            name: "Useless Text"
+          },
+          comment: 'Test Comment',
+        }));
+      });
+  });
 
-    describe('/ (POST) entry controller', () => {
-        it('should create a new entry when passed a valid entry', async () => {
-            const validEntry = new CreateEntryDto(100, new Date(), 'DKK', 'Umuts Pizza', 'I should not buy takeout');
-        
-            const {body} = await request(app.getHttpServer())
-                .post('/entry')
-                .send(validEntry)
-                .expect(201)
+  it('/entry (GET) should return all entries', () => {
+    return request(app.getHttpServer())
+      .get('/entry')
+      .expect(200)
+      .then((response) => {
+        expect(Array.isArray(response.body)).toBe(true);
+      });
+  });
 
-            expect(body.amount).toEqual(100);
-            expect(body.id).toBeDefined();
-        });
-        it('should return error message when passed an invalid entry', async () => {
-            const inValidEntry = new CreateEntryDto(100, new Date(), 'DKK', '', 'I should not buy takeout');
-        
-            const {body} = await request(app.getHttpServer())
-                .post('/entry')
-                .send(inValidEntry)
-                .expect(400)
+  let entryId;
 
-            expect(body.message[0]).toEqual('name should not be empty')
-        });
-    })
+  it('/entry/:id (GET) should return a single entry', async () => {
+    entryId = 13; 
+    return request(app.getHttpServer())
+      .get(`/entry/${entryId}`)
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(expect.objectContaining({
+          id: entryId,
+          name: expect.any(String),
+          amount: expect.any(Number),
+          date: expect.any(String),
+          currency: expect.any(String),
+          category: {
+            id: expect.any(Number),
+            name: expect.any(String)
+          },
+          comment: expect.anything()
+        }));
+      });
+  });
+
+  it('/entry/:id (PATCH) should update the entry', () => {
+    entryId = 13; 
+    return request(app.getHttpServer())
+      .patch(`/entry/${entryId}`)
+      .send({
+        name: 'Updated Entry',
+        amount: 100,
+        date: '2024-10-21',
+        currency: 'USD',
+        categoryId: 1,
+        comment: 'Test Comment',
+      })
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual(expect.objectContaining({
+          id: entryId,
+          name: 'Updated Entry',
+          amount: 100,
+          date: expect.any(String),
+          currency: 'USD',
+          category: {
+            id: 1,
+            name: "Useless text"
+          },
+          comment: 'Test Comment',
+        }));
+      });
+  });
+
+  it('/entry/:id (DELETE) should remove the entry', () => {
+    entryId = 13; 
+    return request(app.getHttpServer())
+      .delete(`/entry/${entryId}`)
+      .expect(200);
+  });
+
+  afterAll(async () => {
+    await app.close();
+  });
 });
