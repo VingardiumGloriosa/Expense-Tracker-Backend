@@ -24,7 +24,7 @@ export class CreateEntryDto {
 
     @IsOptional()
     @IsString()
-    comment: string;
+    comment?: string;
 
     constructor(amount: number, date: Date, currency: string, name: string, categoryId: number, comment?: string){
         this.amount = amount;
